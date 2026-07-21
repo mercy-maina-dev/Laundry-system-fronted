@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { useAuth } from '../../hooks/useAuth'
 import { Link, useNavigate } from 'react-router-dom'
-import { API_URL } from '../../config/api'   // ✅ ADDED IMPORT
+import { API_URL } from '../../config/api'   
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
   ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell,

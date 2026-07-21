@@ -16,9 +16,9 @@ import {
   ArrowRight, ChevronRight, ShoppingBag, RefreshCw,
   Smartphone, Coffee, UserCheck, Shield, Copy, Send,
   CalendarDays, DollarSign, Percent, RefreshCcw,
-  Lightbulb, BookOpen, Mail, Moon    // ✅ added missing icons
+  Lightbulb, BookOpen, Mail, Moon    
 } from 'lucide-react'
-import { API_URL } from '../../config/api'   // ✅ added import
+import { API_URL } from '../../config/api'   
 
 // ---------- Custom Hook: Animated Counter ----------
 const useCounter = (target, duration = 1500) => {
