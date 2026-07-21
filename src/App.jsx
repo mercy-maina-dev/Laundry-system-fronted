@@ -2,11 +2,11 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from './context/AuthContext'
 import { useAuth } from './hooks/useAuth'
-import ProtectedRoute from './components/common/ProtectedRoute'
+import ProtectedRoute from './components/common/ProtectedRoute';
 import Landing from './components/landing/Landing'
-import Login from './pages/auth/Login'
-import Verify from './pages/auth/Verify'
-import Register from './pages/auth/Register'
+import Login from './pages/auth/Login.jsx'
+import Verify from './pages/auth/Verify.jsx'
+import Register from './pages/auth/Register.jsx'
 import DashboardLayout from './layouts/DashboardLayout'
 import AdminDashboard from './pages/dashboards/AdminDashboard'
 import CustomerDashboard from './pages/dashboards/CustomerDashboard'
@@ -24,7 +24,7 @@ function AppRoutes() {
 
   return (
     <>
-      {/* ❌ No global <Navbar /> here */}
+
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<Landing />} />

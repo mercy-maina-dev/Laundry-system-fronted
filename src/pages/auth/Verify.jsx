@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
-import { API_URL } from '../config/api';
+import { API_URL } from '../../config/api';
 import toast from 'react-hot-toast'
 import { Mail, CheckCircle, Send, Lightbulb, Loader2, ArrowLeft } from 'lucide-react'
 
