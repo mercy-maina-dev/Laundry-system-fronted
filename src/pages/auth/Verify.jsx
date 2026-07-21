@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
+import { API_URL } from '../config/api';
 import toast from 'react-hot-toast'
 import { Mail, CheckCircle, Send, Lightbulb, Loader2, ArrowLeft } from 'lucide-react'
 
@@ -47,7 +48,7 @@ export default function Verify() {
 
     setLoading(true)
     try {
-      await axios.post('http://localhost:8088/verify', { 
+      await axios.post(`${API_URL}/verify`, { 
         email, 
         code 
       })
@@ -67,7 +68,7 @@ export default function Verify() {
     
     setResendLoading(true)
     try {
-      await axios.post('http://localhost:8088/resend-verification', { email })
+      await axios.post(`${API_URL}/resend-verification`, { email })
       toast.success('A new verification code has been sent to your email and phone.')
       startTimer()
     } catch (err) {

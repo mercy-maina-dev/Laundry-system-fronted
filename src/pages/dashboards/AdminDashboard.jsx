@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { useAuth } from '../../hooks/useAuth'
 import { Link, useNavigate } from 'react-router-dom'
+import { API_URL } from '../../config/api'   // ✅ ADDED IMPORT
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
   ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell,
@@ -26,7 +27,7 @@ export default function AdminDashboard() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
-  const [refreshing, setRefreshing] = useState(false) // 👈 new state for refresh spinner
+  const [refreshing, setRefreshing] = useState(false)
 
   // ---------- Core State ----------
   const [orders, setOrders] = useState([])
@@ -57,8 +58,8 @@ export default function AdminDashboard() {
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [showMpesaModal, setShowMpesaModal] = useState(false)
   const [showServiceModal, setShowServiceModal] = useState(false)
-  const [showDriverModal, setShowDriverModal] = useState(false) // 👈 new driver modal
-  const [selectedDriver, setSelectedDriver] = useState(null) // 👈 for driver modal
+  const [showDriverModal, setShowDriverModal] = useState(false)
+  const [selectedDriver, setSelectedDriver] = useState(null)
 
   // ---------- Selected Items ----------
   const [selectedOrder, setSelectedOrder] = useState(null)
@@ -111,9 +112,8 @@ export default function AdminDashboard() {
     fetchProfile()
     fetchComplaints()
     fetchFeedback()
-    // Keep auto-refresh every 30s (optional – can be removed)
     const interval = setInterval(() => {
-      fetchDashboardData(true) // silent refresh
+      fetchDashboardData(true)
     }, 30000)
     return () => clearInterval(interval)
   }, [])
@@ -133,22 +133,19 @@ export default function AdminDashboard() {
   // ---------- API Calls ----------
   const fetchDashboardData = async (silent = false) => {
     try {
-      if (!silent) {
-        setLoading(true)
-      } else {
-        setRefreshing(true)
-      }
+      if (!silent) setLoading(true)
+      else setRefreshing(true)
       const token = localStorage.getItem('token')
       const headers = { Authorization: `Bearer ${token}` }
 
-      const ordersRes = await axios.get('http://localhost:8088/orders', { headers })
+      const ordersRes = await axios.get(`${API_URL}/orders`, { headers })
       const ordersData = ordersRes.data?.Orders || ordersRes.data || []
       const ordersArray = Array.isArray(ordersData) ? ordersData : []
       setOrders(ordersArray)
 
       let usersArray = []
       try {
-        const usersRes = await axios.get('http://localhost:8088/admin/users', { headers })
+        const usersRes = await axios.get(`${API_URL}/admin/users`, { headers })
         usersArray = usersRes.data?.Users || usersRes.data || []
       } catch (e) { console.log('Users error:', e.message) }
       setUsers(usersArray)
@@ -158,14 +155,14 @@ export default function AdminDashboard() {
 
       let paymentsArray = []
       try {
-        const paymentsRes = await axios.get('http://localhost:8088/payments', { headers })
+        const paymentsRes = await axios.get(`${API_URL}/payments`, { headers })
         paymentsArray = Array.isArray(paymentsRes.data) ? paymentsRes.data : []
       } catch (e) { console.log('Payments error:', e.message) }
       setPayments(paymentsArray)
 
       let servicesArray = []
       try {
-        const servicesRes = await axios.get('http://localhost:8088/services', { headers })
+        const servicesRes = await axios.get(`${API_URL}/services`, { headers })
         servicesArray = servicesRes.data?.Services || servicesRes.data || []
       } catch (e) { console.log('Services error:', e.message) }
       setServices(servicesArray)
@@ -248,7 +245,7 @@ export default function AdminDashboard() {
   const fetchSettings = async () => {
     try {
       const token = localStorage.getItem('token')
-      const response = await axios.get('http://localhost:8088/settings', { headers: { Authorization: `Bearer ${token}` } })
+      const response = await axios.get(`${API_URL}/settings`, { headers: { Authorization: `Bearer ${token}` } }) // ✅ fixed
       if (response.data) setSettings(response.data)
     } catch (error) { console.log('Settings fetch error:', error.message) }
   }
@@ -272,7 +269,7 @@ export default function AdminDashboard() {
   const fetchComplaints = async () => {
     try {
       const token = localStorage.getItem('token')
-      const response = await axios.get('http://localhost:8088/complaints', { headers: { Authorization: `Bearer ${token}` } })
+      const response = await axios.get(`${API_URL}/complaints`, { headers: { Authorization: `Bearer ${token}` } })
       setComplaints(Array.isArray(response.data) ? response.data : [])
     } catch (error) {
       console.log('Complaints endpoint not found, using mock data')
@@ -286,7 +283,7 @@ export default function AdminDashboard() {
   const fetchFeedback = async () => {
     try {
       const token = localStorage.getItem('token')
-      const response = await axios.get('http://localhost:8088/feedback', { headers: { Authorization: `Bearer ${token}` } })
+      const response = await axios.get(`${API_URL}/feedback`, { headers: { Authorization: `Bearer ${token}` } })
       setFeedback(Array.isArray(response.data) ? response.data : [])
     } catch (error) {
       console.log('Feedback endpoint not found, using mock data')
@@ -318,7 +315,7 @@ export default function AdminDashboard() {
     setMpesaLoading(true)
     try {
       const token = localStorage.getItem('token')
-      await axios.post('http://localhost:8088/mpesa/stkpush', {
+      await axios.post(`${API_URL}/mpesa/stkpush`, {
         phone: mpesaPayment.phone,
         amount: parseFloat(mpesaPayment.amount),
         order_id: parseInt(mpesaPayment.order_id)
@@ -342,7 +339,7 @@ export default function AdminDashboard() {
     if (!validatePhone(newUser.phone)) return
     try {
       const token = localStorage.getItem('token')
-      await axios.post('http://localhost:8088/adduser', newUser, { headers: { Authorization: `Bearer ${token}` } })
+      await axios.post(`${API_URL}/adduser`, newUser, { headers: { Authorization: `Bearer ${token}` } })
       toast.success(`${newUser.full_name} added as ${newUser.role}`)
       setShowAddUserModal(false)
       setNewUser({ full_name: '', email: '', phone: '', password: '', role: 'CUSTOMER' })
@@ -361,7 +358,7 @@ export default function AdminDashboard() {
     if (!validatePhone(newDriver.phone)) return
     try {
       const token = localStorage.getItem('token')
-      await axios.post('http://localhost:8088/adduser', newDriver, { headers: { Authorization: `Bearer ${token}` } })
+      await axios.post(`${API_URL}/adduser`, newDriver, { headers: { Authorization: `Bearer ${token}` } })
       toast.success(`${newDriver.full_name} added as a Driver`)
       setShowAddDriverModal(false)
       setNewDriver({ full_name: '', email: '', phone: '', password: '', role: 'DRIVER' })
@@ -375,7 +372,7 @@ export default function AdminDashboard() {
     if (!window.confirm(`Are you sure you want to delete ${userName}?`)) return
     try {
       const token = localStorage.getItem('token')
-      await axios.delete(`http://localhost:8088/user/${userId}`, { headers: { Authorization: `Bearer ${token}` } })
+      await axios.delete(`${API_URL}/user/${userId}`, { headers: { Authorization: `Bearer ${token}` } })
       toast.success(`${userName} deleted successfully`)
       fetchDashboardData()
     } catch (error) {
@@ -387,7 +384,7 @@ export default function AdminDashboard() {
     if (!window.confirm(`Are you sure you want to delete Order #${orderId}?`)) return
     try {
       const token = localStorage.getItem('token')
-      await axios.delete(`http://localhost:8088/orders/${orderId}`, { headers: { Authorization: `Bearer ${token}` } })
+      await axios.delete(`${API_URL}/orders/${orderId}`, { headers: { Authorization: `Bearer ${token}` } })
       toast.success(`Order #${orderId} deleted successfully`)
       fetchDashboardData()
     } catch (error) {
@@ -398,7 +395,7 @@ export default function AdminDashboard() {
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
       const token = localStorage.getItem('token')
-      await axios.put(`http://localhost:8088/orders/${orderId}`, { status: newStatus }, { headers: { Authorization: `Bearer ${token}` } })
+      await axios.put(`${API_URL}/orders/${orderId}`, { status: newStatus }, { headers: { Authorization: `Bearer ${token}` } })
       toast.success(`Order #${orderId} status updated to ${newStatus}`)
       fetchDashboardData()
     } catch (error) {
@@ -413,7 +410,7 @@ export default function AdminDashboard() {
     }
     try {
       const token = localStorage.getItem('token')
-      await axios.post(`http://localhost:8088/assign-pickup`, {
+      await axios.post(`${API_URL}/assign-pickup`, {
         order_id: orderId,
         driver_id: parseInt(driverId),
         location_address: 'Customer address'
@@ -434,7 +431,7 @@ export default function AdminDashboard() {
     }
     try {
       const token = localStorage.getItem('token')
-      await axios.post('http://localhost:8088/addpayment', {
+      await axios.post(`${API_URL}/addpayment`, {
         order_id: parseInt(cashPayment.order_id),
         amount: parseFloat(cashPayment.amount),
         payment_method: 'CASH',
@@ -458,7 +455,7 @@ export default function AdminDashboard() {
     }
     try {
       const token = localStorage.getItem('token')
-      await axios.put(`http://localhost:8088/complaints/${selectedComplaint.id}`, {
+      await axios.put(`${API_URL}/complaints/${selectedComplaint.id}`, {
         reply: complaintReply,
         status: 'RESOLVED'
       }, { headers: { Authorization: `Bearer ${token}` } })
@@ -481,10 +478,10 @@ export default function AdminDashboard() {
     try {
       const token = localStorage.getItem('token')
       if (editingService) {
-        await axios.put(`http://localhost:8088/services/${editingService.service_id}`, newService, { headers: { Authorization: `Bearer ${token}` } })
+        await axios.put(`${API_URL}/services/${editingService.service_id}`, newService, { headers: { Authorization: `Bearer ${token}` } })
         toast.success('Service updated')
       } else {
-        await axios.post('http://localhost:8088/services', newService, { headers: { Authorization: `Bearer ${token}` } })
+        await axios.post(`${API_URL}/services`, newService, { headers: { Authorization: `Bearer ${token}` } })
         toast.success('Service added')
       }
       setShowServiceModal(false)
@@ -500,7 +497,7 @@ export default function AdminDashboard() {
     if (!window.confirm('Delete this service?')) return
     try {
       const token = localStorage.getItem('token')
-      await axios.delete(`http://localhost:8088/services/${serviceId}`, { headers: { Authorization: `Bearer ${token}` } })
+      await axios.delete(`${API_URL}/services/${serviceId}`, { headers: { Authorization: `Bearer ${token}` } })
       toast.success('Service deleted')
       fetchDashboardData()
     } catch (error) {
@@ -616,7 +613,7 @@ export default function AdminDashboard() {
   const updateProfile = async () => {
     try {
       const token = localStorage.getItem('token')
-      await axios.put(`http://localhost:8088/user/${user?.user_id}`, {
+      await axios.put(`${API_URL}/user/${user?.user_id}`, {
         full_name: profile.full_name,
         email: profile.email,
         phone: profile.phone,
@@ -624,7 +621,6 @@ export default function AdminDashboard() {
       }, { headers: { Authorization: `Bearer ${token}` } })
       toast.success('Profile updated successfully')
       setShowProfileModal(false)
-      // Update local storage
       const updatedUser = { ...user, full_name: profile.full_name, email: profile.email, phone: profile.phone }
       localStorage.setItem('user', JSON.stringify(updatedUser))
     } catch (error) {
@@ -695,17 +691,12 @@ export default function AdminDashboard() {
                 </div>
               )}
             </div>
-            {/* Refresh button with spinner */}
             <button 
               onClick={() => fetchDashboardData(true)} 
               disabled={refreshing}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition flex items-center gap-2 disabled:opacity-70"
             >
-              {refreshing ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <RefreshCw className="w-4 h-4" />
-              )}
+              {refreshing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
               {refreshing ? 'Refreshing...' : 'Refresh'}
             </button>
             <button onClick={exportOrdersCSV} className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition flex items-center gap-2">
@@ -714,7 +705,6 @@ export default function AdminDashboard() {
             <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition">
               {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
             </button>
-            {/* Logout button */}
             <button 
               onClick={handleLogout}
               className="p-2 rounded-full bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 transition"
@@ -1270,62 +1260,60 @@ export default function AdminDashboard() {
         )}
 
         {/* ---------- DRIVERS TAB ---------- */}
-{activeTab === 'drivers' && (
-  <div className={`${getCardTheme()} rounded-2xl shadow-sm border p-6 overflow-x-auto`}>
-    <div className="flex justify-between items-center mb-4">
-      <h3 className="font-bold flex items-center gap-2">
-        <Truck className="w-5 h-5" /> Driver Performance
-      </h3>
-      <button onClick={() => setShowAddDriverModal(true)} className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm transition flex items-center gap-2">
-        <UserCog className="w-4 h-4" /> Add Driver
-      </button>
-    </div>
-    <table className="w-full">
-      <thead className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}>
-        <tr>
-          <th className="p-3 text-left text-xs font-medium uppercase">Name</th>
-          <th className="p-3 text-left text-xs font-medium uppercase">Orders</th>
-          <th className="p-3 text-left text-xs font-medium uppercase">Rating</th>
-          <th className="p-3 text-left text-xs font-medium uppercase">On-Time</th>
-          <th className="p-3 text-left text-xs font-medium uppercase">Revenue</th>
-          <th className="p-3 text-left text-xs font-medium uppercase">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {driverPerformance.map((d, i) => (
-          <tr key={i} className={`border-t ${theme === 'dark' ? 'border-gray-700' : ''}`}>
-            <td className="p-3 text-sm font-medium">{d.name}</td>
-            <td className="p-3 text-sm">{d.orders}</td>
-            <td className="p-3 text-sm text-yellow-500 flex items-center gap-1">{d.rating} <Star className="w-3 h-3 fill-yellow-500 text-yellow-500" /></td>
-            <td className="p-3 text-sm">{d.onTime} min avg</td>
-            <td className="p-3 text-sm font-semibold text-green-600">{settings.currency} {d.revenue}</td>
-            <td className="p-3">
-              <div className="flex flex-wrap gap-1">
-                {/* View button */}
-                <button 
-                  onClick={() => {
-                    setSelectedDriver(d)
-                    setShowDriverModal(true)
-                  }}
-                  className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 transition flex items-center gap-1"
-                >
-                  <Eye className="w-3 h-3" /> View
-                </button>
-                {/* Delete button */}
-                <button 
-                  onClick={() => handleDeleteUser(d.user_id, d.name)}
-                  className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200 transition"
-                >
-                  Delete
-                </button>
-              </div>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-)}
+        {activeTab === 'drivers' && (
+          <div className={`${getCardTheme()} rounded-2xl shadow-sm border p-6 overflow-x-auto`}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-bold flex items-center gap-2">
+                <Truck className="w-5 h-5" /> Driver Performance
+              </h3>
+              <button onClick={() => setShowAddDriverModal(true)} className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm transition flex items-center gap-2">
+                <UserCog className="w-4 h-4" /> Add Driver
+              </button>
+            </div>
+            <table className="w-full">
+              <thead className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}>
+                <tr>
+                  <th className="p-3 text-left text-xs font-medium uppercase">Name</th>
+                  <th className="p-3 text-left text-xs font-medium uppercase">Orders</th>
+                  <th className="p-3 text-left text-xs font-medium uppercase">Rating</th>
+                  <th className="p-3 text-left text-xs font-medium uppercase">On-Time</th>
+                  <th className="p-3 text-left text-xs font-medium uppercase">Revenue</th>
+                  <th className="p-3 text-left text-xs font-medium uppercase">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {driverPerformance.map((d, i) => (
+                  <tr key={i} className={`border-t ${theme === 'dark' ? 'border-gray-700' : ''}`}>
+                    <td className="p-3 text-sm font-medium">{d.name}</td>
+                    <td className="p-3 text-sm">{d.orders}</td>
+                    <td className="p-3 text-sm text-yellow-500 flex items-center gap-1">{d.rating} <Star className="w-3 h-3 fill-yellow-500 text-yellow-500" /></td>
+                    <td className="p-3 text-sm">{d.onTime} min avg</td>
+                    <td className="p-3 text-sm font-semibold text-green-600">{settings.currency} {d.revenue}</td>
+                    <td className="p-3">
+                      <div className="flex flex-wrap gap-1">
+                        <button 
+                          onClick={() => {
+                            setSelectedDriver(d)
+                            setShowDriverModal(true)
+                          }}
+                          className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 transition flex items-center gap-1"
+                        >
+                          <Eye className="w-3 h-3" /> View
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteUser(d.user_id, d.name)}
+                          className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200 transition"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
         {/* ---------- SETTINGS TAB ---------- */}
         {activeTab === 'settings' && (
@@ -1372,7 +1360,7 @@ export default function AdminDashboard() {
                 <button onClick={async () => {
                   try {
                     const token = localStorage.getItem('token')
-                    await axios.put('http://localhost:8088/settings', settings, { headers: { Authorization: `Bearer ${token}` } })
+                    await axios.put(`${API_URL}/settings`, settings, { headers: { Authorization: `Bearer ${token}` } }) // ✅ fixed
                     toast.success('Settings saved successfully')
                   } catch (error) {
                     toast.error('Failed to save settings')

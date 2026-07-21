@@ -7,7 +7,9 @@ import {
   Star, Bell, Menu, X, Send, Camera, Navigation, TrendingUp,
   Fuel, BarChart, Flag, LogOut, MessageCircle, Award, Sun, Moon,
   Circle, Truck, Home, Sparkles, ArrowRight, Loader2,
+  DollarSign, Settings, Lightbulb, CloudRain, Zap
 } from 'lucide-react'
+import { API_URL } from '../../config/api'   // <-- ADDED: import API_URL
 
 export default function DriverDashboard() {
   const { user } = useAuth()
@@ -62,11 +64,12 @@ export default function DriverDashboard() {
     setTime(now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }))
   }
 
-  // ---------- API CALLS (MOCK) ----------
+  // ---------- API CALLS ----------
   const fetchAssignedOrders = async () => {
     try {
       const token = localStorage.getItem('token')
-      const response = await axios.get(`http://localhost:8088/driver/${user?.user_id}/orders`, {
+      // UPDATED: use API_URL from config
+      const response = await axios.get(`${API_URL}/driver/${user?.user_id}/orders`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       const data = response.data.data || []

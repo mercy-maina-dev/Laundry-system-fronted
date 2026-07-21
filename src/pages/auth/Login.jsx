@@ -1,7 +1,11 @@
+
+
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import toast from 'react-hot-toast'
+import { API_URL } from '../config/api';
+
 import { useAuth } from '../../hooks/useAuth'
 import { 
   Mail, Lock, Eye, EyeOff, ArrowRight, 
@@ -32,7 +36,7 @@ export default function Login() {
     e.preventDefault()
     setLoading(true)
     try {
-      const response = await axios.post('http://localhost:8088/login', { email, password })
+      const response = await axios.post(`${API_URL}/login`, { email, password })
       if (response.data.token) {
         const userData = response.data.user
         login(userData, response.data.token)

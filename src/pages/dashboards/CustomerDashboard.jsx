@@ -16,7 +16,9 @@ import {
   ArrowRight, ChevronRight, ShoppingBag, RefreshCw,
   Smartphone, Coffee, UserCheck, Shield, Copy, Send,
   CalendarDays, DollarSign, Percent, RefreshCcw,
+  Lightbulb, BookOpen, Mail, Moon    // ✅ added missing icons
 } from 'lucide-react'
+import { API_URL } from '../../config/api'   // ✅ added import
 
 // ---------- Custom Hook: Animated Counter ----------
 const useCounter = (target, duration = 1500) => {
@@ -229,7 +231,7 @@ export default function CustomerDashboard() {
     try {
       if (!silent) setLoading(true)
       const token = localStorage.getItem('token')
-      const response = await axios.get('http://localhost:8088/orders', {
+      const response = await axios.get(`${API_URL}/orders`, {   // ✅ changed
         headers: { Authorization: `Bearer ${token}` }
       })
       const ordersData = response.data.Orders || response.data || []
@@ -237,7 +239,7 @@ export default function CustomerDashboard() {
       const driverMap = {}
       for (const order of ordersData) {
         try {
-          const driverRes = await axios.get(`http://localhost:8088/order/${order.order_id}/driver`, {
+          const driverRes = await axios.get(`${API_URL}/order/${order.order_id}/driver`, {   // ✅ changed
             headers: { Authorization: `Bearer ${token}` }
           })
           if (driverRes.data) driverMap[order.order_id] = driverRes.data
@@ -262,7 +264,7 @@ export default function CustomerDashboard() {
   const fetchPayments = async () => {
     try {
       const token = localStorage.getItem('token')
-      const response = await axios.get('http://localhost:8088/payments', {
+      const response = await axios.get(`${API_URL}/payments`, {   // ✅ changed
         headers: { Authorization: `Bearer ${token}` }
       })
       setPayments(response.data || [])
@@ -272,7 +274,7 @@ export default function CustomerDashboard() {
   const fetchReferralData = async () => {
     try {
       const token = localStorage.getItem('token')
-      const res = await axios.get('http://localhost:8088/referral', {
+      const res = await axios.get(`${API_URL}/referral`, {   // ✅ changed
         headers: { Authorization: `Bearer ${token}` }
       })
       setReferralCode(res.data.code || 'LAUNDRY123')
@@ -286,7 +288,7 @@ export default function CustomerDashboard() {
   const fetchSubscription = async () => {
     try {
       const token = localStorage.getItem('token')
-      const res = await axios.get('http://localhost:8088/subscription', {
+      const res = await axios.get(`${API_URL}/subscription`, {   // ✅ changed
         headers: { Authorization: `Bearer ${token}` }
       })
       setSubscription(res.data)
@@ -322,7 +324,7 @@ export default function CustomerDashboard() {
   const handleProfileUpdate = async () => {
     try {
       const token = localStorage.getItem('token')
-      await axios.put(`http://localhost:8088/user/${user?.user_id}`, {
+      await axios.put(`${API_URL}/user/${user?.user_id}`, {   // ✅ changed
         full_name: profile.full_name,
         email: profile.email,
         phone: profile.phone
@@ -427,7 +429,7 @@ export default function CustomerDashboard() {
     setPaymentLoading(true)
     try {
       const token = localStorage.getItem('token')
-      await axios.post('http://localhost:8088/mpesa/stkpush', {
+      await axios.post(`${API_URL}/mpesa/stkpush`, {   // ✅ changed
         phone: phoneClean,
         amount: parseFloat(paymentAmount),
         order_id: paymentOrder.order_id
@@ -455,7 +457,7 @@ export default function CustomerDashboard() {
     if (!window.confirm('Are you sure you want to cancel this order?')) return
     try {
       const token = localStorage.getItem('token')
-      await axios.post(`http://localhost:8088/orders/${orderId}/cancel`, {}, {
+      await axios.post(`${API_URL}/orders/${orderId}/cancel`, {}, {   // ✅ changed
         headers: { Authorization: `Bearer ${token}` }
       })
       toast.success(`Order #${orderId} cancelled successfully.`)
@@ -475,7 +477,7 @@ export default function CustomerDashboard() {
   const handleReorder = async (order) => {
     try {
       const token = localStorage.getItem('token')
-      const res = await axios.post(`http://localhost:8088/orders/${order.order_id}/reorder`, {}, {
+      const res = await axios.post(`${API_URL}/orders/${order.order_id}/reorder`, {}, {   // ✅ changed
         headers: { Authorization: `Bearer ${token}` }
       })
       toast.success(`Reorder placed! New order #${res.data.order_id}`)
@@ -496,7 +498,7 @@ export default function CustomerDashboard() {
   const handleSubmitRating = async () => {
     try {
       const token = localStorage.getItem('token')
-      await axios.post('http://localhost:8088/feedback', {
+      await axios.post(`${API_URL}/feedback`, {   // ✅ changed
         order_id: ratingOrder.order_id,
         rating: ratingValue,
         comment: ratingComment
@@ -514,7 +516,7 @@ export default function CustomerDashboard() {
   const handleSubscribe = async (plan) => {
     try {
       const token = localStorage.getItem('token')
-      await axios.post('http://localhost:8088/subscriptions', { plan }, {
+      await axios.post(`${API_URL}/subscriptions`, { plan }, {   // ✅ changed
         headers: { Authorization: `Bearer ${token}` }
       })
       toast.success(`Subscribed to ${plan} plan!`)
@@ -528,7 +530,7 @@ export default function CustomerDashboard() {
   const handleUnsubscribe = async () => {
     try {
       const token = localStorage.getItem('token')
-      await axios.delete('http://localhost:8088/subscriptions', {
+      await axios.delete(`${API_URL}/subscriptions`, {   // ✅ changed
         headers: { Authorization: `Bearer ${token}` }
       })
       toast.success('Unsubscribed successfully')

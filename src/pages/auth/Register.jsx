@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { API_URL } from '../config/api';
+
 import toast from 'react-hot-toast'
 import { 
   User, Mail, Phone, Lock, Eye, EyeOff, ArrowRight,
@@ -64,11 +66,11 @@ export default function Register() {
 
     setLoading(true)
     try {
-      await axios.post('http://localhost:8088/adduser', {
+      await axios.post(`${API_URL}/adduser`, {
         full_name: fullName,
         email,
         phone,
-        password,
+        password,     
         role: 'CUSTOMER'  // Hardcoded – only customers can register
       })
       toast.success(`Welcome ${fullName}! Your account has been created. Please check your email and phone for verification code.`)

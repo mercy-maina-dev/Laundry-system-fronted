@@ -3,7 +3,6 @@ import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from './context/AuthContext'
 import { useAuth } from './hooks/useAuth'
 import ProtectedRoute from './components/common/ProtectedRoute'
-// ✅ Navbar removed – each page now manages its own navigation
 import Landing from './components/landing/Landing'
 import Login from './pages/auth/Login'
 import Verify from './pages/auth/Verify'

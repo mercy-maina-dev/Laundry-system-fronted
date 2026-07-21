@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 // Social media icons from react-icons
 import { FaFacebook, FaTwitter, FaInstagram } from 'react-icons/fa'
+import { API_URL } from '../config/api'   // <-- ADDED: import API_URL
 
 export default function SettingsPage() {
   const { user } = useAuth()
@@ -50,7 +51,8 @@ export default function SettingsPage() {
   const fetchSettings = async () => {
     try {
       const token = localStorage.getItem('token')
-      const response = await axios.get('http://localhost:8088/settings', {
+      // UPDATED: use API_URL from config
+      const response = await axios.get(`${API_URL}/settings`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       if (response.data) {
@@ -67,7 +69,8 @@ export default function SettingsPage() {
     setSaving(true)
     try {
       const token = localStorage.getItem('token')
-      await axios.put('http://localhost:8088/settings', settings, {
+      // UPDATED: use API_URL from config
+      await axios.put(`${API_URL}/settings`, settings, {
         headers: { Authorization: `Bearer ${token}` }
       })
       toast.success('Settings saved successfully!')
